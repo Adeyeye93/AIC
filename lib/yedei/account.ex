@@ -267,6 +267,17 @@ defmodule Yedei.Account do
     end
   end
 
+  def deliver_user_confirmation_pin(%User{} = user, code)
+      when is_binary(code) do
+    if user.confirmed_at do
+      {:error, :already_confirmed}
+    else
+      {_encoded_token, user_token} = UserToken.build_email_token(user, "confirm")
+      Repo.insert!(user_token)
+      UserNotifier.deliver_confirmation_instructions(user, code)
+    end
+  end
+
   @doc """
   Confirms a user by the given token.
 

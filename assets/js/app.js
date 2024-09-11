@@ -21,6 +21,8 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+import ToasterComponent from "../js/react/toast"
+
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
@@ -29,9 +31,9 @@ let liveSocket = new LiveSocket("/live", Socket, {
 })
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
-window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
-window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
+// topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
+// window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
+// window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()
@@ -42,3 +44,69 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+
+  window.addEventListener("phx:page-patch", () => {
+    if (window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
+
+
+   // Restore scroll position on page reload
+ let scrollPos = sessionStorage.getItem("scrollPos");
+ if (scrollPos) {
+   window.scrollTo({
+     top: parseInt(scrollPos),
+     behavior: "smooth", // This enables smooth scrolling
+   });
+ }
+
+    // Save the scroll position before the page unloads
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.setItem("scrollPos", window.scrollY);
+    });
+
+  window.addEventListener("phx:login_user", (e) => {
+      let attrs = e.detail.user;
+      fetch("/users/log_in?_action=registered", {
+        method: "POST",
+        headers: {        
+          "Content-Type": "application/json",
+          "x-csrf-token": document
+            .querySelector("meta[name='csrf-token']")
+            .getAttribute("content"),
+        },
+        body: JSON.stringify(attrs), // Send the user_id within a "user" object
+      })
+        .then((response) => {
+          if (response.ok) {
+            this.pending = false; // Reset pending status
+          } else {
+            console.error("Login failed");
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    });
+
+    const rootElement = document.getElementById("root");
+
+    window.addEventListener("phx:page-loading-start", (info) => {
+      console.log("LiveView loading started", info);
+      toast.loading("Page is loading");
+    });
+
+    window.addEventListener("phx:page-loading-stop", (info) => {
+      console.log("LiveView loading stopped", info);
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(<ToasterComponent />);
+    });
+
+    import { toast } from "sonner";
+
+    window.addEventListener("phx:flash", (e) => {
+      if ((e.data = "expired")) {
+        toast.error("Your code is expired please resend");
+      } else {
+        toast.error("Your code is incorrect");
+      }
+    });

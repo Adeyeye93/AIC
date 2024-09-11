@@ -18,9 +18,7 @@ defmodule YedeiWeb.UserSessionController do
     create(conn, params, "Welcome back!")
   end
 
-  defp create(conn, %{"user" => user_params}, info) do
-    %{"email" => email, "password" => password} = user_params
-
+  defp create(conn, %{"email" => email, "password" => password} = user_params, info) do
     if user = Account.get_user_by_email_and_password(email, password) do
       conn
       |> put_flash(:info, info)

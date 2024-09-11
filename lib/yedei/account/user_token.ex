@@ -1,5 +1,5 @@
 defmodule Yedei.Account.UserToken do
-  use Ecto.Schema
+  use Yedei.Schema
   import Ecto.Query
   alias Yedei.Account.UserToken
 

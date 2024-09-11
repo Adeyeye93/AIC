@@ -17,11 +17,13 @@ defmodule YedeiWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", YedeiWeb do
-    pipe_through :browser
+  # scope "/", YedeiWeb do
+  #   pipe_through [:browser, :redirect_if_user_is_authenticated]
+  #   live_session :redirect_if_user_is_authenticated do
 
-    get "/", PageController, :home
-  end
+
+  #   end
+  # end
 
   # Other scopes may use custom stacks.
   # scope "/api", YedeiWeb do
@@ -56,6 +58,11 @@ defmodule YedeiWeb.Router do
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
+
+
+      live "/", Control.HomeLive, :home
+      live "/video", Control.VideoLive, :video
+      live "/auth/register", Control.HomeLive, :signup
     end
 
     post "/users/log_in", UserSessionController, :create

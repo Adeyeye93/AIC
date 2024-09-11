@@ -14,8 +14,8 @@ defmodule Yedei.Application do
       {Phoenix.PubSub, name: Yedei.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Yedei.Finch},
-      # Start a worker by calling: Yedei.Worker.start_link(arg)
-      # {Yedei.Worker, arg},
+      {DynamicSupervisor, name: Yedei.Server.Supervisor, strategy: :one_for_one},
+      {Registry, keys: :unique, name: Yedei.EmailVerificationRegistry},
       # Start to serve requests, typically the last entry
       YedeiWeb.Endpoint
     ]

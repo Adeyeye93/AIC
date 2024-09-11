@@ -20,16 +20,16 @@ defmodule Yedei.Account.UserNotifier do
   @doc """
   Deliver instructions to confirm account.
   """
-  def deliver_confirmation_instructions(user, url) do
+  def deliver_confirmation_instructions(user, code) do
     deliver(user.email, "Confirmation instructions", """
 
     ==============================
 
-    Hi #{user.email},
+    Hi #{user.username},
 
-    You can confirm your account by visiting the URL below:
+    You can confirm your account by using the code below:
 
-    #{url}
+    #{code}
 
     If you didn't create an account with us, please ignore this.
 
