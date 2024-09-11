@@ -192,28 +192,31 @@ defmodule YedeiWeb.SignupLive do
   end
 
   def handle_event("verify_code", %{"code" => code}, socket) do
-    user = socket.assigns.current_user.id
-    case Yedei.EmailVerificationServer.verify_code(code, user) do
-      {:ok, _response} ->
+    user = socket.assigns.form.data.id
+    case Yedei.EmailVerificationServer.verify_code(user, code) do
+      %{status: :success, msg: msg} ->
         socket =
           socket
-          |> push_event("flash", %{msg: "Your Email has been verified"})
+          |> push_event("flash", %{msg: msg})
           |> push_navigate(to: "/")
 
         {:noreply, socket}
 
-      {:error, :expired} ->
+      %{
+         status: :expired,
+         msg: msg
+       } ->
         socket =
           socket
-          |> assign(:error_message, "Your code is expired. Please request a new one.")
-          |> push_event("flash", %{msg: "Your code is expired. Please request a new one."})
+          |> assign(:error_message, msg)
+          |> push_event("flash", %{msg: msg})
         {:noreply, socket}
 
-      {:error, :wrong_code} ->
+      %{status: :wrong, msg: msg} ->
         socket =
           socket
-          |> assign(:error_message, "Wrong code. Please try again.")
-          |> push_event("flash", %{msg: "Wrong code. Please try again."})
+          |> assign(:error_message, msg)
+          |> push_event("flash", %{msg: msg})
         {:noreply, socket}
     end
   end

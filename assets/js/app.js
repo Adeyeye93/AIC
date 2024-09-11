@@ -21,7 +21,9 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import ToasterComponent from "../js/react/toast"
+import ToasterComponent from "./react/toast"
+import React from "react";
+import ReactDOM from "react-dom/client";
 
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
@@ -52,16 +54,14 @@ window.liveSocket = liveSocket
   });
 
 
-   // Restore scroll position on page reload
  let scrollPos = sessionStorage.getItem("scrollPos");
  if (scrollPos) {
    window.scrollTo({
      top: parseInt(scrollPos),
-     behavior: "smooth", // This enables smooth scrolling
+     behavior: "smooth",
    });
  }
 
-    // Save the scroll position before the page unloads
     window.addEventListener("beforeunload", () => {
       sessionStorage.setItem("scrollPos", window.scrollY);
     });
@@ -88,11 +88,13 @@ window.liveSocket = liveSocket
         .catch((error) => console.error("Error:", error));
     });
 
-    const rootElement = document.getElementById("root");
+    const rootElement = document.getElementById("live-view-container");
+
+    import { toast } from "sonner";
 
     window.addEventListener("phx:page-loading-start", (info) => {
       console.log("LiveView loading started", info);
-      toast.loading("Page is loading");
+      toast.loading("loading...");
     });
 
     window.addEventListener("phx:page-loading-stop", (info) => {
@@ -101,12 +103,7 @@ window.liveSocket = liveSocket
       root.render(<ToasterComponent />);
     });
 
-    import { toast } from "sonner";
-
     window.addEventListener("phx:flash", (e) => {
-      if ((e.data = "expired")) {
-        toast.error("Your code is expired please resend");
-      } else {
-        toast.error("Your code is incorrect");
-      }
+      console.log(e.data)
+        toast.error(e.data.msg);
     });

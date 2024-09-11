@@ -46,7 +46,7 @@ defmodule Yedei.EmailVerificationServer do
       {:reply, %{status: :success, msg: "Your Email has been verified"}, new_state}
 
     true ->
-      {:reply, %{status: :wrong, msg: "Wrong code"}, state}
+      {:reply, %{status: :wrong, msg: "Wrong code. Please try again."}, state}
   end
 end
 
