@@ -8,10 +8,11 @@
       <%= assigns[:page_title] || "Yedei" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.jsx"}>
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
   <body class="bg-bgd" id="live-view-container" phx-hook="ScrollToTop">
+    <div id="root"></div>
     <ul class="relative z-10 flex items-center h-16 lg:px-28 justify-between shadow-ok">
       <%= if @current_user do %>
       <% else %>

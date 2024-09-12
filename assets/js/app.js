@@ -24,6 +24,9 @@ import topbar from "../vendor/topbar"
 import ToasterComponent from "./react/toast"
 import React from "react";
 import ReactDOM from "react-dom/client";
+import SampleDemo from "./react/prime";
+import { toast } from "sonner";
+
 
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
@@ -88,22 +91,50 @@ window.liveSocket = liveSocket
         .catch((error) => console.error("Error:", error));
     });
 
-    const rootElement = document.getElementById("live-view-container");
+    const rootElement = document.getElementById("root");
+   
 
-    import { toast } from "sonner";
+    const root = ReactDOM.createRoot(rootElement);
 
-    window.addEventListener("phx:page-loading-start", (info) => {
-      console.log("LiveView loading started", info);
-      toast.loading("loading...");
-    });
+
 
     window.addEventListener("phx:page-loading-stop", (info) => {
-      console.log("LiveView loading stopped", info);
-      const root = ReactDOM.createRoot(rootElement);
       root.render(<ToasterComponent />);
     });
 
-    window.addEventListener("phx:flash", (e) => {
-      console.log(e.data)
-        toast.error(e.data.msg);
+    window.addEventListener("phx:save", () => {
+      console.log("save called")
+       const otp_form_email_verification = document.getElementById(
+         "otp_form_email_verification"
+       );
+       const email_verification = ReactDOM.createRoot(
+         otp_form_email_verification
+       );
+      email_verification.render(<SampleDemo />);
     });
+
+const promise = () =>
+  new Promise((resolve) => {
+    const handler = (e) => {
+      resolve({ msg: e.detail.msg });
+    };
+
+    window.addEventListener("stop_promise", handler);
+  });
+
+window.addEventListener("phx:flash", (e) => {
+    const type = e.detail.type;
+    const msg = e.detail.msg; 
+
+    if (toast[type]) {
+        toast[type](msg);
+    } else {
+        toast.promise(promise(), {
+          loading: msg,
+          success: (data) => `${data.msg}`,
+          error: "An error occurred!",
+        });
+    }
+});
+
+

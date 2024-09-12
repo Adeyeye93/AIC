@@ -284,21 +284,32 @@ defmodule Yedei.Account do
   If the token matches, the user account is marked as confirmed
   and the token is deleted.
   """
-  def confirm_user(token) do
-    with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
-         %User{} = user <- Repo.one(query),
-         {:ok, %{user: user}} <- Repo.transaction(confirm_user_multi(user)) do
-      {:ok, user}
-    else
-      _ -> :error
-    end
+  # def confirm_user(token) do
+  #   with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
+  #        %User{} = user <- Repo.one(query),
+  #        {:ok, %{user: user}} <- Repo.transaction(confirm_user_multi(user)) do
+  #     {:ok, user}
+  #   else
+  #     _ -> :error
+  #   end
+  # end
+
+  def confirm_user(user_id) do
+      with %User{} = user <- Repo.get(User, user_id),
+           {:ok, %{user: user}} <- Repo.transaction(confirm_user_multi(user)) do
+        {:ok, user}
+      else
+        _ -> :error
+      end
   end
 
-  defp confirm_user_multi(user) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.confirm_changeset(user))
-    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, ["confirm"]))
-  end
+
+defp confirm_user_multi(user) do
+  Ecto.Multi.new()
+  |> Ecto.Multi.update(:user, User.confirm_changeset(user))
+  |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, ["confirm"]))
+end
+
 
   ## Reset password
 
