@@ -11,10 +11,71 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="bg-bgd" id="live-view-container" phx-hook="ScrollToTop">
+  <body class="bg-bgd max-h-screen" id="live-view-container" phx-hook="ScrollToTop">
     <div id="root"></div>
-    <ul class="relative z-10 flex items-center h-16 lg:px-28 justify-between shadow-ok">
+    <ul class="relative z-10 flex items-center h-16 lg:px-28 justify-between  border-b border-slate-700">
       <%= if @current_user do %>
+      <div class="flex items-center justify-between flex-wrap w-5/12 h-full">
+          <.link
+            href={~p"/"}
+            class="text-2xl poppins-black pr-11 text-slate-100 gap-20"
+          >
+            Yedei
+          </.link>
+          <li>
+          <.link
+            href={~p"/users/register"}
+            class="poppins-medium text-sm text-slate-200 gap-10 hover:text-brand"
+          >
+            Creators
+          </.link> 
+        </li>
+        <li>
+          <.link
+            href={~p"/users/register"}
+            class="poppins-medium text-sm font-bold text-slate-200 gap-10 hover:text-brand"
+          >
+            Popular
+          </.link>
+        </li><li>
+          <.link
+            href={~p"/users/register"}
+            class="poppins-medium text-sm font-bold text-slate-200 gap-10 hover:text-brand"
+          >
+            assets
+          </.link>
+        </li><li>
+          <.link
+            href={~p"/users/register"}
+            class="poppins-medium text-sm font-bold text-slate-200 gap-10 hover:text-brand"
+          >
+            materials
+          </.link>
+        </li>
+        </div>
+        <%= if @app do %>
+        <div class="flex items-center justify-end gap-4 flex-wrap w-2/6 h-full">
+            <li>
+              <.link
+                patch={~p"/auth/register"}
+              >
+                <button class="cursor-pointer rounded-md bg-light bg-opacity-50 border-2 border-light border-opacity-40 px-6 py-1 text-xs poppins-light border-solid text-white shadow-lg transition active:scale-[.95]">Feedback</button>
+                
+              </.link>
+            </li>
+          </div>
+        <% else %>
+        <div class="flex items-center justify-end gap-4 flex-wrap w-2/6 h-full">
+            <li>
+              <.link
+                patch={~p"/auth/register"}
+              >
+                <button class="cursor-pointer rounded-md bg-light bg-opacity-50 border-2 border-light border-opacity-40 px-6 py-1 text-xs poppins-light border-solid text-white shadow-lg transition active:scale-[.95]">Dashboard</button>
+                
+              </.link>
+            </li>
+          </div>
+        <% end %>
       <% else %>
         <div class="flex items-center justify-between flex-wrap w-5/12 h-full">
           <.link

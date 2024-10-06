@@ -1,6 +1,8 @@
+/* This file is for your main application CSS */
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
 @layer tailwind-base, primereact, tailwind-utilities;
 
 @import 'primereact/resources/themes/lara-light-blue/theme.css' layer(primereact);
@@ -16,8 +18,6 @@
   @tailwind utilities;
 } 
  
-/* This file is for your main application CSS */
-
 
 .poppins-thin {
   font-family: "Poppins", sans-serif;

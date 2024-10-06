@@ -2,7 +2,7 @@ defmodule YedeiWeb.Control.HomeLive do
   use YedeiWeb, :live_view
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, page_title: :Yedei)}
+    {:ok, assign(socket, %{page_title: :Yedei, app: false})}
   end
 
   def handle_event("video", _unsigned_params, socket) do
@@ -29,5 +29,4 @@ defmodule YedeiWeb.Control.HomeLive do
   def action(socket, :login, _param) do
     assign(socket, page_title: "Login")
   end
-
 end

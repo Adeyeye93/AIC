@@ -64,6 +64,6 @@ defmodule YedeiWeb.Control.VideoLive do
   end
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, page_title: :video)}
+    {:ok, assign(socket, %{page_title: :video, app: false})}
   end
 end

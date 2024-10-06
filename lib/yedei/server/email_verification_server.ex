@@ -23,7 +23,7 @@ defmodule Yedei.EmailVerificationServer do
   @impl true
   def handle_call(:generate_pin, _from, state) do
     pin =
-      Enum.take_random(0..9, 6)
+      Enum.take_random(0..9, 4)
       |> Enum.join()
     new_state = Map.put(state, :vcode, pin)
     timer()
@@ -34,19 +34,20 @@ defmodule Yedei.EmailVerificationServer do
   @impl true
   def handle_call({:verify_code, pin}, _from, %{:vcode => code, :expired => expired} = state) do
     cond do
-    expired ->
-      {:reply,
-       %{
-         status: :expired,
-         msg: "Your code is expired, Please click resend to try again"
-       }, state}
-
     code == pin ->
       new_state = state |> Map.put(:vcode, "") |> Map.put(:used, true)
       {:reply, %{status: :success, msg: "Your Email has been verified"}, new_state}
 
-    true ->
+    code !== pin ->
       {:reply, %{status: :wrong, msg: "Wrong code. Please try again."}, state}
+
+    expired ->
+    {:reply,
+      %{
+        status: :expired,
+        msg: "Your code is expired, Please click resend to try again"
+      }, state}
+
   end
 end
 
@@ -57,6 +58,6 @@ end
     {:noreply, new_state}
   end
   defp timer do
-    Process.send_after(self(), :time_up, :timer.minutes(2))
+    Process.send_after(self(), :time_up, :timer.minutes(5))
   end
 end

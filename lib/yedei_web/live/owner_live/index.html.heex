@@ -1,0 +1,46 @@
+<%!-- <.header>
+  Listing Owners
+  <:actions>
+    <.link patch={~p"/owners/new"}>
+      <.button>New Owner</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="owners"
+  rows={@streams.owners}
+  row_click={fn {_id, owner} -> JS.navigate(~p"/owners/#{owner}") end}
+>
+  <:col :let={{_id, owner}} label="Profile picture"><%= owner.profile_picture %></:col>
+  <:col :let={{_id, owner}} label="Role"><%= owner.Role %></:col>
+  <:col :let={{_id, owner}} label="Bio"><%= owner.Bio %></:col>
+  <:col :let={{_id, owner}} label="Location"><%= owner.location %></:col>
+  <:col :let={{_id, owner}} label="Categories"><%= owner.Categories %></:col>
+  <:col :let={{_id, owner}} label="Account status"><%= owner.Account_Status %></:col>
+  <:action :let={{_id, owner}}>
+    <div class="sr-only">
+      <.link navigate={~p"/owners/#{owner}"}>Show</.link>
+    </div>
+    <.link patch={~p"/owners/#{owner}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, owner}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: owner.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table> --%>
+
+<.modal :if={@live_action in [:new, :edit]} id="owner-modal" show on_cancel={JS.patch(~p"/owners")}>
+  <.live_component
+    module={YedeiWeb.OwnerLive.FormComponent}
+    id={@owner.id || :new}
+    title={@page_title}
+    action={@live_action}
+    owner={@owner}
+    patch={~p"/owners"}
+  />
+</.modal>

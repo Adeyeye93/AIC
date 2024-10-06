@@ -8,7 +8,6 @@ export default function SampleDemo() {
     const [resendTimer, setResendTimer] = useState(60); // Timer starts from 60 seconds
     const [canResend, setCanResend] = useState(false);
 
-    // Custom input for OTP
     const customInput = ({ events, props }) => {
         return (
             <>
@@ -24,7 +23,6 @@ export default function SampleDemo() {
         );
     };
 
-    // Effect for handling the timer countdown
     useEffect(() => {
         let timer;
         if (!canResend && resendTimer > 0) {
@@ -39,18 +37,21 @@ export default function SampleDemo() {
         return () => clearInterval(timer);
     }, [resendTimer, canResend]);
 
-    // Effect to disable/enable submit button based on OTP input
     useEffect(() => {
         setIsSubmitDisabled(token.length !== 4); // Disable if OTP is not 4 digits
     }, [token]);
 
-    // Handle resend click to reset timer
-    const handleResend = () => {
+    const handleResend = (event) => {
         if (canResend) {
-            setResendTimer(60); // Reset the timer
+            event.preventDefault()
+            setResendTimer(60); 
             setCanResend(false);
         }
     };
+ const handleOtpChange = (e) => {
+    const combinedCode = typeof e.value === 'string' ? e.value : e.value.join(''); 
+    document.getElementById('combined-otp-code').value = combinedCode;
+};
 
     return (
         <div className="card flex justify-center">
@@ -96,15 +97,23 @@ export default function SampleDemo() {
             <div className="flex flex-col items-center justify-between h-64 w-full">
                 <p className="font-bold poppins-extrabold text-gray-100 text-xl mb-2">Verify Your Account</p>
                 <p className="text-gray-100 poppins-regular block mb-5">Please enter the code sent to your email.</p>
-                <InputOtp value={token} onChange={(e) => setTokens(e.value)} length={4} inputTemplate={customInput} style={{ gap: 0 }} />
+                <InputOtp value={token} onChange={(e) => {setTokens(e.value); handleOtpChange(e);}} length={4} inputTemplate={customInput} style={{ gap: 0 }} />
                 <input type="hidden" name="code" id="combined-otp-code" />
 
                 <div className="flex w-80 justify-between items-center mt-5">
                     {/* Resend Button or Timer */}
                     {canResend ? (
-                        <Button label="Resend Code" link className="p-0" onClick={handleResend} />
+                                <Button
+            label={canResend ? "Resend Code" : `Resend in ${resendTimer}`}
+            phx-click="Resend"
+            text
+            className={`p-0 ${canResend ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+            onClick={handleResend}
+            disabled={!canResend}
+                                />
+
                     ) : (
-                        <p className="text-gray-200 poppins-light">Resend in {resendTimer}</p>
+                        <p className="text-gray-200 poppins-light" >Resend in {resendTimer}</p>
                     )}
 
                     {/* Submit Button, disabled until OTP is entered */}

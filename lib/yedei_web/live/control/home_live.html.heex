@@ -74,7 +74,7 @@
   </div>
 </section>
 
-<div class="relative max-w-screen-xl p-4 px-4 mx-auto bg-bgd hite dark:bg-gray-800 sm:px-6 lg:px-8 py-26 lg:mt-20">
+<div class="relative max-w-screen-xl p-4 px-4 mx-auto bg-bgd hite dark:bg-bgd sm:px-6 lg:px-8 py-26 lg:mt-20">
     <div class="relative">
         <div class="lg:grid lg:grid-flow-row-dense lg:grid-cols-2 lg:gap-8 lg:items-center">
             <div class="ml-auto lg:col-start-2 lg:max-w-2xl">
@@ -226,7 +226,7 @@
 </div>
                                     
 <.modal :if={@live_action == :signup} id="signup_modal" show on_cancel={JS.patch(~p"/")}>
-<.live_component module={YedeiWeb.SignupLive} id={:register} action={@live_action} signup={:signup} />
+<.live_component module={YedeiWeb.SignupLive} id={:register} action={@live_action} signup={:signup}/>
 </.modal>
 
 <%!-- <.modal :if={@live_action == :login} id="login_modal" show on_cancel={JS.patch(~p"/")}>

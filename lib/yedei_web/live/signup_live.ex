@@ -22,9 +22,14 @@ defmodule YedeiWeb.SignupLive do
           </svg>
 
           <h2 class="poppins-medium text-xl text-gray-200 mt-6 mb-12">Register For free</h2>
+            <.link href="#" type="reset" class="-ml-3 w-max p-3">
+              <span class="text-sm tracking-wide text-sky-600 dark:text-sky-400">
+                Login Instead
+              </span>
+            </.link>
         </div>
 
-        <div class="w-7/12 border-l-2 border-solid bg-box border-gray-700 dark:bg-gray-800 p-8">
+        <div class="w-7/12 border-l-2 border-solid bg-box border-gray-700 dark:bg-box p-8">
           <h3 class="text-2xl font-semibold text-white">Register</h3>
 
           <div class="mt-12 flex flex-wrap sm:grid gap-6 grid-cols-2">
@@ -114,25 +119,13 @@ defmodule YedeiWeb.SignupLive do
                 phx-disable-with="Creating account..."
                 class="w-full bg-sky-400 h-11 flex items-center justify-center px-6 py-3 transition hover:bg-sky-600 focus:bg-sky-600 active:bg-sky-800"
               >
-                <span class="text-base font-semibold text-gray-900">Login</span>
+                <span class="text-base font-semibold text-gray-900">Register</span>
               </.button>
             </:actions>
-
-            <button type="reset" class="-mr-3 w-max">
-              <span class="text-sm poppins-light tracking-wide text-sky-600 dark:text-sky-400">
-                Forgot password ?
-              </span>
-            </button>
-
-            <button href="#" type="reset" class="-ml-3 w-max p-3">
-              <span class="text-sm tracking-wide text-sky-600 dark:text-sky-400">
-                Create new account
-              </span>
-            </button>
           </.simple_form>
         </div>
       <% else %>
-        <div class="w-full bg-box border-gray-700 dark:bg-gray-800">
+        <div class="w-full bg-box border-gray-700 dark:bg-box">
           <form
             id="registration_form"
             phx-submit="verify_code"
@@ -150,6 +143,7 @@ defmodule YedeiWeb.SignupLive do
   end
 
   def update(assigns, socket) do
+    IO.inspect(assigns)
     if assigns.signup == :signup do
       changeset = User.confirm_changeset(%User{})
 
@@ -171,7 +165,9 @@ defmodule YedeiWeb.SignupLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    case Account.register_user(user_params) do
+    user_data =
+      Map.put(user_params, "events", %{:Account_Status => :online})
+    case Account.register_user(user_data) do
       {:ok, user} ->
         {:ok, _} =
           Supervisor.start_email_verification(user.id)
@@ -212,7 +208,7 @@ defmodule YedeiWeb.SignupLive do
             socket =
               socket
               |> push_event("flash", %{msg: msg, type: :success})
-              |> push_navigate(to: "/")
+              |> push_navigate(to: "/#{socket.assigns.form.data.username}/feeds?_new_user=true")
 
               {:noreply, socket}
           :error ->
@@ -226,7 +222,7 @@ defmodule YedeiWeb.SignupLive do
         socket =
           socket
           |> assign(:error_message, msg)
-          |> push_event("flash", %{msg: msg, type: :info})
+          |> push_event("flash_resend_otp", %{msg: msg, msg1: "Resend OTP"})
 
         {:noreply, socket}
 
@@ -240,9 +236,23 @@ defmodule YedeiWeb.SignupLive do
     end
   end
 
+  def handle_resend("resend_code", %{"data" => data}, socket) do
+    IO.puts("Received data: #{data}")
+    user = socket.assigns.form.data.id
+    [{pid, _}] = Registry.lookup(Yedei.EmailVerificationRegistry, user)
+    DynamicSupervisor.terminate_child(Yedei.Server.Supervisor, pid)
+    %{vcode: code} = Yedei.EmailVerificationServer.generate_pin(user.id)
+      Account.deliver_user_confirmation_pin(user, code)
+
+      socket =
+        socket
+        |> push_event("flash", %{msg: "Email verification code has been sent to #{socket.assigns.form.data.email}", msg1: "Sending Email..."})
+        {:noreply, socket}
+  end
+
+
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     form = to_form(changeset, as: "user")
-
     if changeset.valid? do
       assign(socket, form: form, check_errors: false)
     else

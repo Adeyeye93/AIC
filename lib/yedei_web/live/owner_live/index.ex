@@ -1,30 +1,12 @@
-defmodule YedeiWeb.UserSettingsLive do
+defmodule YedeiWeb.OwnerLive.Index do
   use YedeiWeb, :live_view
-
 
   alias Yedei.Profile
   alias Yedei.Profile.Owner
 
   @impl true
-  def render(assigns) do
-    ~H"""
-        <%= case @live_action do %>
-        <% :setting-> %>
-        <.live_component module={YedeiWeb.Settings.Settings} id={:setting} current_user={@current_user} />
-        <% :profile -> %>
-        <.live_component module={YedeiWeb.Settings.ProfileUser} id={:profile} current_user={@current_user} owner={@current_user.id} />
-        <% end %>
-    """
-  end
-
-  @impl true
   def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(%{:app =>  true, :view => "setting"})
-      |> stream(socket, :owners, Profile.list_owners())
-
-    {:ok, socket}
+    {:ok, stream(socket, :owners, Profile.list_owners())}
   end
 
   @impl true
@@ -48,5 +30,18 @@ defmodule YedeiWeb.UserSettingsLive do
     socket
     |> assign(:page_title, "Listing Owners")
     |> assign(:owner, nil)
+  end
+
+  @impl true
+  def handle_info({YedeiWeb.OwnerLive.FormComponent, {:saved, owner}}, socket) do
+    {:noreply, stream_insert(socket, :owners, owner)}
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    owner = Profile.get_owner!(id)
+    {:ok, _} = Profile.delete_owner(owner)
+
+    {:noreply, stream_delete(socket, :owners, owner)}
   end
 end

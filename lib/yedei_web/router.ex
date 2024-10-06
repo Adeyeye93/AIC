@@ -17,13 +17,15 @@ defmodule YedeiWeb.Router do
     plug :accepts, ["json"]
   end
 
-  # scope "/", YedeiWeb do
-  #   pipe_through [:browser, :redirect_if_user_is_authenticated]
-  #   live_session :redirect_if_user_is_authenticated do
+  scope "/", YedeiWeb do
+    pipe_through [:browser]
+    live_session :browser do
 
-
-  #   end
-  # end
+      live "/", Control.HomeLive, :home
+      live "/video", Control.VideoLive, :video
+      live "/auth/register", Control.HomeLive, :signup
+    end
+  end
 
   # Other scopes may use custom stacks.
   # scope "/api", YedeiWeb do
@@ -60,21 +62,31 @@ defmodule YedeiWeb.Router do
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
 
 
-      live "/", Control.HomeLive, :home
-      live "/video", Control.VideoLive, :video
-      live "/auth/register", Control.HomeLive, :signup
     end
 
     post "/users/log_in", UserSessionController, :create
   end
+
+
 
   scope "/", YedeiWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
       on_mount: [{YedeiWeb.UserAuth, :ensure_authenticated}] do
-      live "/users/settings", UserSettingsLive, :edit
+      live "/:users/settings", UserSettingsLive, :setting
+      live "/:users/profile", UserSettingsLive, :profile
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+
+
+      live "/:username/feeds", App.FeedLive, :user_feed
+      live "/owners", OwnerLive.Index, :index
+      live "/owners/new", OwnerLive.Index, :new
+      live "/owners/:id/edit", OwnerLive.Index, :edit
+
+      live "/owners/:id", OwnerLive.Show, :show
+      live "/owners/:id/show/edit", OwnerLive.Show, :edit
     end
   end
 

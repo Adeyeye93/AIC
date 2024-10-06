@@ -9,7 +9,9 @@ defmodule Yedei.Account.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
-    
+
+    has_one :owner, Yedei.Profile.Owner
+
     timestamps(type: :utc_datetime)
   end
 
@@ -39,6 +41,7 @@ defmodule Yedei.Account.User do
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:username, :email, :password])
+    |> cast_assoc(:owner, with: &Yedei.Profile.Owner.changeset/2)
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_username(opts)

@@ -7,6 +7,10 @@ const path = require("path")
 
 module.exports = {
   content: ["./js/**/*.js", "../lib/yedei_web.ex", "../lib/yedei_web/**/*.*ex"],
+  darkMode: "class",
+  theme: {
+    extend: {},
+  },
   theme: {
     extend: {
       colors: {

@@ -65,7 +65,6 @@ defmodule YedeiWeb.CoreComponents do
               id={"#{@id}-container"}
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
-              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
               class="relative hidden rounded-md bg-box shadow-line transition"
             >
               <div class="absolute top-6 right-5">
